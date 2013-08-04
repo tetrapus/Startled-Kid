@@ -1,5 +1,7 @@
 Feature list
 
+- Goal: Feature parity with reddit investigator
+
 Statistics
 - Subreddit breakdown
 - Likes/dislikes
@@ -9,5 +11,5 @@ Analysis
 - Gone[mw]ild submissions
 
 External
-- Other accounts checker (okc, github, etc)
+- Other accounts checker (okc, github, facebook, google, google search, last.fm, tumblr, formspring, snapchat)
 - Mentioned external links
