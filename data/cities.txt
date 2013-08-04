@@ -16,7 +16,6 @@ astoria
 athens
 atlanta
 auroraillinois
-australia
 baltimorecounty
 bayarea
 birmingham
