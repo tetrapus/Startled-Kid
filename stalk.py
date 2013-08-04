@@ -83,7 +83,7 @@ if nsfw:
 	for i in nsfw:
 		print "%s (%s | %s up, %s down)" % (i.title, i.subreddit.url, i.ups, i.downs)
 		print "%s%s" % (i.url, " [NSFW]" if i.over_18 else "")
-narcissist = [re.findall(r"(\bi( am a| live| have)\b[^.]+\.)", i.body, flags=re.IGNORECASE) for i in comments]
+narcissist = [re.findall(r"([^.\n]*\bi( am a| live| have)\b[^.\n]+\.)", i.body, flags=re.IGNORECASE) for i in comments]
 narcissist = [i[0][0] for i in narcissist if i]
 if narcissist:
 	print "---- About ----"
