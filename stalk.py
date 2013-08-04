@@ -2,6 +2,7 @@
 # Reddit data miner
 
 import sys
+import re
 
 import praw
 
@@ -9,7 +10,7 @@ if len(sys.argv) < 2:
 	print("Usage: %s user" % sys.argv[0])
 	sys.exit(1)
 
-r = praw.Reddit(user_agent='startled-kid/0.0.1 by Lyucit')
+r = praw.Reddit(user_agent='startled-kid/0.0.1 via praw by Lyucit')
 
 user = r.get_redditor(sys.argv[1])
 
@@ -82,6 +83,12 @@ if nsfw:
 	for i in nsfw:
 		print "%s (%s | %s up, %s down)" % (i.title, i.subreddit.url, i.ups, i.downs)
 		print "%s%s" % (i.url, " [NSFW]" if i.over_18 else "")
+narcissist = [re.findall(r"(\bi( am a| live| have)\b[^.]+\.)", i.body, flags=re.IGNORECASE) for i in comments]
+narcissist = [i[0][0] for i in narcissist if i]
+if narcissist:
+	print "---- About ----"
+	for i in narcissist:
+		print i
 
 subreddits = set(open("data/flairreddits.txt").read().split()) & ({i.lower() for i in ssubs} | {i.lower() for i in csubs})
 if "-f" in sys.argv:
@@ -99,4 +106,5 @@ cities = open("data/cities.txt").read().split()
 city = [i for i in csubs + ssubs if i.lower() in cities]
 if city:
 	print "Probably lives in %s" % max(city, key=city.count)
+
 
