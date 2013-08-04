@@ -16,6 +16,7 @@ astoria
 athens
 atlanta
 auroraillinois
+australia
 baltimorecounty
 bayarea
 birmingham
@@ -23,6 +24,7 @@ boston
 bradford
 brampton
 brisbane
+britain
 buenosaires
 bullcity
 burbank
@@ -178,6 +180,7 @@ texas
 thousandoaks
 toronto
 twincities
+unitedkingdom
 utah
 vallejo
 vancouver

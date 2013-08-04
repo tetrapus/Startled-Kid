@@ -52,7 +52,7 @@ def is_gm_sub(subname):
 	return False
 
 def get_gonewild(posts):
-	posts = [i for i in posts if is_gw_sub(i.subreddit.display_name)]
+	posts = [i for i in posts if is_gw_sub(i.subreddit.display_name) or i.over_18 and re.search("[[({<][mft]+[]})>]", i.title, flags=re.IGNORECASE)]
 	return posts
 
 def get_gonemild(posts):
@@ -64,6 +64,14 @@ def get_nsfw_submissions(posts, include_gw=False):
 	if not include_gw:
 		posts = [i for i in posts if not is_gw_sub(i.subreddit.display_name)]
 	return posts
+
+narcissist = [re.findall(r"([^.\n]*\bi( am a| live| have| used to| go to| love| use)\b[^.\n]+\.)", i.body, flags=re.IGNORECASE) for i in comments]
+narcissist = [i[0][0] for i in narcissist if i]
+narcissist = [i for i in narcissist if "than i " not in i.lower() and "i'm not" not in i.lower()] # be conservative
+if narcissist:
+	print "---- About ----"
+	for i in narcissist:
+		print i
 
 gw = get_gonewild(submissions)
 if gw:
@@ -83,23 +91,10 @@ if nsfw:
 	for i in nsfw:
 		print "%s (%s | %s up, %s down)" % (i.title, i.subreddit.url, i.ups, i.downs)
 		print "%s%s" % (i.url, " [NSFW]" if i.over_18 else "")
-narcissist = [re.findall(r"([^.\n]*\bi( am a| live| have)\b[^.\n]+\.)", i.body, flags=re.IGNORECASE) for i in comments]
-narcissist = [i[0][0] for i in narcissist if i]
-if narcissist:
-	print "---- About ----"
-	for i in narcissist:
-		print i
 
 subreddits = set(open("data/flairreddits.txt").read().split()) & ({i.lower() for i in ssubs} | {i.lower() for i in csubs})
 if "-f" in sys.argv:
 	subreddits |= {i.lower() for i in ssubs} | {i.lower() for i in csubs}
-
-flairs = {i:r.get_flair(i, sys.argv[1])["flair_text"] for i in subreddits}
-flairs = {k:v for k, v in flairs.items() if v}
-if flairs:
-	print "---- Known Flair ----"
-	for k, v in flairs.items():
-		print "r/%s - %s" % (k, v)
 
 cities = open("data/cities.txt").read().split()
 
@@ -107,4 +102,12 @@ city = [i for i in csubs + ssubs if i.lower() in cities]
 if city:
 	print "Probably lives in %s" % max(city, key=city.count)
 
+firstflair = True
+for i in subreddits:
+	flair = r.get_flair(i, sys.argv[1])["flair_text"]
+	if flair:
+		if firstflair:
+			print "---- Known Flair ----"
+		firstflair = False
+		print "r/%s - %s" % (i, flair)
 
