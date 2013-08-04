@@ -1,0 +1,13 @@
+Feature list
+
+Statistics
+- Subreddit breakdown
+- Likes/dislikes
+- Verbosity / Spelling / Grammar
+
+Analysis
+- Gone[mw]ild submissions
+
+External
+- Other accounts checker (okc, github, etc)
+- Mentioned external links
