@@ -11,5 +11,5 @@ Analysis
 - Extract geolocation from photos
 
 External
-- Other accounts checker (okc, github, facebook, google, google search, last.fm, tumblr, formspring, snapchat, skype, imgur)
+- Other accounts checker (okc, github, facebook, google, google search, last.fm, tumblr, formspring, snapchat, skype, imgur, grindr)
 - Mentioned external links
