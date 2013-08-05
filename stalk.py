@@ -97,10 +97,15 @@ if "-f" in sys.argv:
 	subreddits |= {i.lower() for i in ssubs} | {i.lower() for i in csubs}
 
 cities = open("data/cities.txt").read().split()
+countries = open("data/countries.txt").read().split()
 
 city = [i for i in csubs + ssubs if i.lower() in cities]
+if not cities:
+	city = [i for i in csubs + ssubs if i.lower() in cities]
 if city:
-	print "Probably lives in %s" % max(city, key=city.count)
+	best = max(city, key=city.count)
+	print "** Probably lives in %s (confidence = %d)" % (best, city.count(best))
+
 
 firstflair = True
 for i in subreddits:
@@ -111,3 +116,18 @@ for i in subreddits:
 		firstflair = False
 		print "r/%s - %s" % (i, flair)
 
+class Profile(object):
+	"""
+	Build a profile of known data for a user.
+	"""
+	age = None
+	sex = None
+	sexuality = None
+	phone = None
+	city = None
+	country = None
+	drugs = None
+	mbti = None
+	politics = None
+	religion = None
+	social = None

@@ -30,7 +30,6 @@ burbank
 california
 cambridgema
 campbell
-canada
 canberra
 cardiff
 carlisle
@@ -95,6 +94,7 @@ kennesaw
 kentucky
 kingcounty
 kirkland
+kitchener
 kolkata
 leicester
 libertymo
@@ -179,7 +179,6 @@ texas
 thousandoaks
 toronto
 twincities
-unitedkingdom
 utah
 vallejo
 vancouver
