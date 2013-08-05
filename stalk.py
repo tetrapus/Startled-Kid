@@ -3,6 +3,7 @@
 
 import sys
 import re
+import time
 
 import praw
 
@@ -89,7 +90,9 @@ print "%s (%s)%s%s%s%s" % (user.name, user.fullname,
 					   " [MOD]" if user.is_mod else "", 
 					   " [VERIFIED]" if user.has_verified_email else "",
 					   " [CHILD]" if not user.over_18 else "")
-
+print "Link karma:    %d (%.2fpts/day, %.2fpts/post)"    % (user.link_karma, user.link_karma / (time.time() - user.created_utc), user.link_karma / len(submissions))
+print "Comment karma: %d (%.2fpts/day, %.2fpts/comment)" % (user.comment_karma,user.comment_karma / (time.time() - user.created_utc), user.comment_karma / len(comments))
+print "Created :      %s UTC" % time.asctime(time.gmtime(user.created_utc))
 
 narcissist = [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use)\b[^.\n\[\]]+)", i.body, flags=re.IGNORECASE) for i in comments]
 narcissist += [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use)\b[^.\n\[\]]+)", i.selftext, flags=re.IGNORECASE) for i in submissions if i.is_self]
