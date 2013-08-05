@@ -117,7 +117,7 @@ countries = open("data/countries.txt").read().split()
 
 city = [i for i in subreddits if i.lower() in cities]
 if not cities:
-	city = [i for i in subreddits if i.lower() in cities]
+	city = [i for i in subreddits if i.lower() in countries]
 if city:
 	best = max(city, key=city.count)
 	print "** Probably lives in %s (confidence = %d)" % (best, float(city.count(best)) / len(cities))
