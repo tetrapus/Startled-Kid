@@ -84,7 +84,7 @@ for i in breakdown:
 	print "%5d  %5d   %5d   /r/%s" % i
 
 print "---- User Data ----"
-print "%s (%s)%s%s%s" % (user.name, user.fullname, 
+print "%s (%s)%s%s%s%s" % (user.name, user.fullname, 
 					   " [GOLD]" if user.is_gold else "", 
 					   " [MOD]" if user.is_mod else "", 
 					   " [VERIFIED]" if user.has_verified_email else "",
