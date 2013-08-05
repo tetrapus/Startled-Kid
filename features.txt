@@ -6,6 +6,7 @@ Statistics
 - Subreddit breakdown
 - Likes/dislikes
 - Verbosity / Spelling / Grammar
+- Awake times
 
 Analysis
 - Extract geolocation from photos

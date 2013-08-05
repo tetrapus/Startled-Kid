@@ -1,3 +1,5 @@
 canada
 australia
 unitedkingdom
+japan
+france

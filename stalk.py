@@ -74,6 +74,23 @@ def get_nsfw_submissions(posts, include_gw=False):
 		posts = [i for i in posts if not is_gw_sub(i.subreddit.display_name)]
 	return posts
 
+# Generate a statistical analysis
+print "---- Subreddit breakdown ----"
+print "Total | Post | Reply | Subreddit"
+breakdown = set(subreddits)
+breakdown = [(subreddits.count(i), ssubs.count(i), csubs.count(i), i) for i in breakdown]
+breakdown.sort(key=lambda x: (-x[0], -x[1], -x[2], x[3]))
+for i in breakdown:
+	print "%5d  %5d   %5d   /r/%s" % i
+
+print "---- User Data ----"
+print "%s (%s)%s%s%s" % (user.name, user.fullname, 
+					   " [GOLD]" if user.is_gold else "", 
+					   " [MOD]" if user.is_mod else "", 
+					   " [VERIFIED]" if user.has_verified_email else "",
+					   " [CHILD]" if not user.over_18 else "")
+
+
 narcissist = [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use)\b[^.\n\[\]]+)", i.body, flags=re.IGNORECASE) for i in comments]
 narcissist += [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use)\b[^.\n\[\]]+)", i.selftext, flags=re.IGNORECASE) for i in submissions if i.is_self]
 narcissist = [i[0][0] for i in narcissist if i]
@@ -155,3 +172,7 @@ class Profile(object):
 
 class Metric(object):
 	pass
+
+class FlairData(Metric):
+	pass
+
