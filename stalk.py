@@ -18,15 +18,11 @@ print "Fetching comment history..."
 comments = list(user.get_comments(limit=None))
 print "Fetching submission history..."
 submissions = list(user.get_submitted(limit=None))
-likes = []
-dislikes = []
-subreddits = []
-friends = []
 
 csubs = [i.subreddit.display_name for i in comments]
 ssubs = [i.subreddit.display_name for i in submissions]
-#print csubs
-#print ssubs
+subreddits = csubs + ssubs
+
 
 gonewild = open("data/gonewild.txt").read().split()
 gonemild = open("data/gonemild.txt").read().split()
@@ -59,15 +55,29 @@ def get_gonemild(posts):
 	posts = [i for i in posts if is_gm_sub(i.subreddit.display_name)]
 	return posts
 
+def get_selfies(posts):
+	# Currently only detects me mondays
+	posts = [(i, re.findall(r"\[.*\]\((.+)\)", i.body)) for i in posts]
+	links = []
+	for post, urls in posts:
+		urls = [i for i in urls if not i.endswith(".gif")]
+		#if urls and "me monday" in post.submission.title.lower():
+		for url in urls:
+			links.append((post, url))
+
+	return links
+
+
 def get_nsfw_submissions(posts, include_gw=False):
 	posts = [i for i in posts if i.over_18 and not i.is_self]
 	if not include_gw:
 		posts = [i for i in posts if not is_gw_sub(i.subreddit.display_name)]
 	return posts
 
-narcissist = [re.findall(r"([^.\n]*\bi( am a| live| have| used to| go to| love| use)\b[^.\n]+\.)", i.body, flags=re.IGNORECASE) for i in comments]
+narcissist = [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use)\b[^.\n\[\]]+)", i.body, flags=re.IGNORECASE) for i in comments]
+narcissist += [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use)\b[^.\n\[\]]+)", i.selftext, flags=re.IGNORECASE) for i in submissions if i.is_self]
 narcissist = [i[0][0] for i in narcissist if i]
-narcissist = [i for i in narcissist if "than i " not in i.lower() and "i'm not" not in i.lower()] # be conservative
+narcissist = [i for i in narcissist if "than i " not in i.lower() and "i have no" not in i.lower() and "i have gotten" not in i.lower()] # be conservative
 if narcissist:
 	print "---- About ----"
 	for i in narcissist:
@@ -85,6 +95,12 @@ if gm:
 	for i in gm:
 		print "%s (%s | %s up, %s down)" % (i.title, i.subreddit.url, i.ups, i.downs)
 		print "%s%s" % (i.url, " [NSFW]" if i.over_18 else "")
+#selfies = get_selfies(comments)
+#if selfies:
+#	print "---- Comment links ----"
+#	for i, url in selfies:
+#		print "%s (%s | %s up, %s down)" % (url, i.subreddit.url, i.ups, i.downs)
+
 nsfw = get_nsfw_submissions(submissions)
 if nsfw:
 	print "---- NSFW Submissions ----"
@@ -99,22 +115,25 @@ if "-f" in sys.argv:
 cities = open("data/cities.txt").read().split()
 countries = open("data/countries.txt").read().split()
 
-city = [i for i in csubs + ssubs if i.lower() in cities]
+city = [i for i in subreddits if i.lower() in cities]
 if not cities:
-	city = [i for i in csubs + ssubs if i.lower() in cities]
+	city = [i for i in subreddits if i.lower() in cities]
 if city:
 	best = max(city, key=city.count)
-	print "** Probably lives in %s (confidence = %d)" % (best, city.count(best))
+	print "** Probably lives in %s (confidence = %d)" % (best, float(city.count(best)) / len(cities))
 
 
 firstflair = True
 for i in subreddits:
-	flair = r.get_flair(i, sys.argv[1])["flair_text"]
-	if flair:
+	flair = r.get_flair(i, sys.argv[1])
+	flairtext = flair["flair_text"]
+	if flair["flair_css_class"]:
+		flairtext = "%s: %s" % (flair["flair_css_class"], flairtext)
+	if flairtext:
 		if firstflair:
 			print "---- Known Flair ----"
 		firstflair = False
-		print "r/%s - %s" % (i, flair)
+		print "r/%s - %s" % (i, flairtext)
 
 class Profile(object):
 	"""
@@ -131,3 +150,8 @@ class Profile(object):
 	politics = None
 	religion = None
 	social = None
+	hipster = None # subreddits like mfa, coffee, etc
+	depression = None
+
+class Metric(object):
+	pass
