@@ -90,8 +90,8 @@ print "%s (%s)%s%s%s%s" % (user.name, user.fullname,
 					   " [MOD]" if user.is_mod else "", 
 					   " [VERIFIED]" if user.has_verified_email else "",
 					   " [CHILD]" if not user.over_18 else "")
-print "Link karma:    %d (%.2fpts/day, %.2fpts/post)"    % (user.link_karma, user.link_karma / (time.time() - user.created_utc), user.link_karma / len(submissions))
-print "Comment karma: %d (%.2fpts/day, %.2fpts/comment)" % (user.comment_karma,user.comment_karma / (time.time() - user.created_utc), user.comment_karma / len(comments))
+print "Link karma:    %d (%.2fpts/day, %.2fpts/post)"    % (user.link_karma,86400* user.link_karma / (time.time() - user.created_utc), user.link_karma / len(submissions) if submissions else 0)
+print "Comment karma: %d (%.2fpts/day, %.2fpts/comment)" % (user.comment_karma,86400*user.comment_karma / (time.time() - user.created_utc), user.comment_karma / len(comments) if submissions else 0)
 print "Created :      %s UTC" % time.asctime(time.gmtime(user.created_utc))
 
 narcissist = [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use)\b[^.\n\[\]]+)", i.body, flags=re.IGNORECASE) for i in comments]

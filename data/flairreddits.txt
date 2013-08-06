@@ -2,6 +2,7 @@
 adhd
 ainbow
 android
+aquariums
 asexuality
 askgsm
 askhistorians
@@ -10,7 +11,9 @@ askscience
 askwomen
 aspergers
 atheism
+battlefield3
 bigdickproblems
+biology
 bisexual
 blackberry
 britishproblems
@@ -34,6 +37,7 @@ guildwars2
 highschool
 ingress
 intj
+iphone
 kindle
 leageoflegends
 lgbt
