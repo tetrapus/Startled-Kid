@@ -15,10 +15,35 @@ r = praw.Reddit(user_agent='startled-kid/0.0.1 via praw by Lyucit')
 
 user = r.get_redditor(sys.argv[1])
 
-print "Fetching comment history..."
-comments = list(user.get_comments(limit=None))
+print "---- User Data ----"
+print "%s (%s)%s%s%s%s" % (user.name, user.fullname, 
+					   " [GOLD]" if user.is_gold else "", 
+					   " [MOD]" if user.is_mod else "", 
+					   " [VERIFIED]" if user.has_verified_email else "",
+					   " [CHILD]" if not user.over_18 else "")
+print "Created :      %s UTC" % time.asctime(time.gmtime(user.created_utc))
+
 print "Fetching submission history..."
 submissions = list(user.get_submitted(limit=None))
+
+print "---- Link Data ----"
+print "Most upvotes: %s" % max(submissions, key=lambda x: x.ups)
+print "Most downvotes: %s" % max(submissions, key=lambda x: x.downs)
+print "Best: %s" % max(submissions, key=lambda x: x.score)
+print "Worst: %s" % min(submissions, key=lambda x: x.score)
+print "Links: %s" % len(submissions)
+print "Link karma: %d (%.2fpts/day, %.2fpts/post)"    % (user.link_karma,86400* user.link_karma / (time.time() - user.created_utc), user.link_karma / len(submissions) if submissions else 0)
+
+print "Fetching comment history..."
+comments = list(user.get_comments(limit=None))
+
+print "---- Comment Data ----"
+print "Most upvotes: %s" % max(comments, key=lambda x: x.ups)
+print "Most downvotes: %s" % max(comments, key=lambda x: x.downs)
+print "Best: %s" % max(comments, key=lambda x: x.score)
+print "Worst: %s" % min(comments, key=lambda x: x.score)
+print "Comments: %s" % len(comments)
+print "Comment karma: %d (%.2fpts/day, %.2fpts/comment)" % (user.comment_karma,86400*user.comment_karma / (time.time() - user.created_utc), user.comment_karma / len(comments) if submissions else 0)
 
 csubs = [i.subreddit.display_name for i in comments]
 ssubs = [i.subreddit.display_name for i in submissions]
@@ -84,15 +109,28 @@ breakdown.sort(key=lambda x: (-x[0], -x[1], -x[2], x[3]))
 for i in breakdown:
 	print "%5d  %5d   %5d   /r/%s" % i
 
-print "---- User Data ----"
-print "%s (%s)%s%s%s%s" % (user.name, user.fullname, 
-					   " [GOLD]" if user.is_gold else "", 
-					   " [MOD]" if user.is_mod else "", 
-					   " [VERIFIED]" if user.has_verified_email else "",
-					   " [CHILD]" if not user.over_18 else "")
-print "Link karma:    %d (%.2fpts/day, %.2fpts/post)"    % (user.link_karma,86400* user.link_karma / (time.time() - user.created_utc), user.link_karma / len(submissions) if submissions else 0)
-print "Comment karma: %d (%.2fpts/day, %.2fpts/comment)" % (user.comment_karma,86400*user.comment_karma / (time.time() - user.created_utc), user.comment_karma / len(comments) if submissions else 0)
-print "Created :      %s UTC" % time.asctime(time.gmtime(user.created_utc))
+words = sum(len(i.body.split()) for i in comments)
+letters = sum(len(i.body) for i in comments)
+dictionary = set(open("/usr/share/dict/words").read().lower().split())
+
+reduce_words = " ".join([i.body for i in comments]) # Join comments
+reduce_words = re.sub(r"((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[-A-Za-z0-9.]+|(?:www.|[-;:&=\+\$,\w]+@)[-A-Za-z0-9.]+)((?:\/[-\+~%\/.\w_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)", " ", reduce_words)
+reduce_words = re.sub(r"&.{1,6};", " ", reduce_word)
+reduce_words = re.sub(r"([^-'\w]|_)", " ", reduce_words)
+reduce_words = re.sub(r"(([^\w])[-']|[-']([^\w])|^[-']|[-']$)", " ", reduce_words).lower().split()
+reduce_words = [i for i in reduce_words if not re.match(r"\d", i) and re.match("[a-zA-Z]", i)]
+unique = set(reduce_words) - dictionary
+
+print "---- Word Data ----"
+print "Letters used: %s" % letters
+print "Words: %s" % words
+print "Unique words: %s" % len(set(reduce_words))
+print "Non-dictionary words: %s (%2f%%)" % (len(unique), 100*len(unique)/len(reduce_words))
+print "Most common: %s" % (", ".join(sorted(list(unique), key=lambda x: -reduce_words.count(x))[:10])) 
+print "Words/comment: %s" % (float(words) / len(comments))
+print "Karma/Letter: %s" % (float(user.comment_karma) / letters)
+print "Karma/Word: %s"% (float(user.comment_karma) / words)
+
 
 narcissist = [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use)\b[^.\n\[\]]+)", i.body, flags=re.IGNORECASE) for i in comments]
 narcissist += [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use)\b[^.\n\[\]]+)", i.selftext, flags=re.IGNORECASE) for i in submissions if i.is_self]
