@@ -177,8 +177,7 @@ if not cities:
 	city = [i for i in subreddits if i.lower() in countries]
 if city:
 	best = max(city, key=city.count)
-	print "** Probably lives in %s (confidence = %d)" % (best, float(city.count(best)) / len(cities))
-print city
+	print "** Probably lives in %s (confidence = %3f)" % (best, float(city.count(best)) / len(city))
 
 fsubs = set(open("data/flairreddits.txt").read().split()) & ({i.lower() for i in ssubs} | {i.lower() for i in csubs})
 if "-f" in sys.argv:
