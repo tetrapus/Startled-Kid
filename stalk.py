@@ -169,10 +169,6 @@ if nsfw:
 		print "%s (%s | %s up, %s down)" % (i.title, i.subreddit.url, i.ups, i.downs)
 		print "%s%s" % (i.url, " [NSFW]" if i.over_18 else "")
 
-subreddits = set(open("data/flairreddits.txt").read().split()) & ({i.lower() for i in ssubs} | {i.lower() for i in csubs})
-if "-f" in sys.argv:
-	subreddits |= {i.lower() for i in ssubs} | {i.lower() for i in csubs}
-
 cities = open("data/cities.txt").read().split()
 countries = open("data/countries.txt").read().split()
 
@@ -182,10 +178,14 @@ if not cities:
 if city:
 	best = max(city, key=city.count)
 	print "** Probably lives in %s (confidence = %d)" % (best, float(city.count(best)) / len(cities))
+print city
 
+fsubs = set(open("data/flairreddits.txt").read().split()) & ({i.lower() for i in ssubs} | {i.lower() for i in csubs})
+if "-f" in sys.argv:
+	fsubs |= {i.lower() for i in ssubs} | {i.lower() for i in csubs}
 
 firstflair = True
-for i in subreddits:
+for i in fsubs:
 	flair = r.get_flair(i, sys.argv[1])
 	flairtext = flair["flair_text"]
 	if flair["flair_css_class"]:

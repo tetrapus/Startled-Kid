@@ -41,6 +41,7 @@ charlestonwv
 charlotte
 cherokeecountyga
 chicago
+christchurch
 coeurdalene
 cologne
 colorado
@@ -148,6 +149,7 @@ pennsylvania
 perth
 pueblo
 queens
+chch
 queensland
 realnyc
 regionalaustralia

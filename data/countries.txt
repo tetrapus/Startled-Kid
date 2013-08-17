@@ -3,3 +3,4 @@ australia
 unitedkingdom
 japan
 france
+newzealand
