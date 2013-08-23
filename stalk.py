@@ -166,6 +166,7 @@ nsfw = get_nsfw_submissions(submissions)
 if nsfw:
 	print "---- NSFW Submissions ----"
 	for i in nsfw:
+		# temporary fix
 		print "%s (%s | %s up, %s down)" % (i.title, i.subreddit.url, i.ups, i.downs)
 		print "%s%s" % (i.url, " [NSFW]" if i.over_18 else "")
 
@@ -179,10 +180,20 @@ if city:
 	best = max(city, key=city.count)
 	print "** Probably lives in %s (confidence = %3f)" % (best, float(city.count(best)) / len(city))
 
-fsubs = set(open("data/flairreddits.txt").read().split()) & ({i.lower() for i in ssubs} | {i.lower() for i in csubs})
+dsubs = set(open("data/drugs.txt").read().split()) & ({i.lower() for i in ssubs} | {i.lower() for i in csubs})
+lowersubs = map(unicode.lower, subreddits)
+dsubs = [(i, lowersubs.count(i)) for i in dsubs]
+if dsubs:
+	print "Probably a drug user. Contributor to: %s" % (", ".join("%s[%d]" % i for i in sorted(dsubs, key=lambda x: -x[1])))
+
+uflairs = set(open("data/flairreddits.txt").read().split())
+fsubs = uflairs & ({i.lower() for i in ssubs} | {i.lower() for i in csubs})
 if "-f" in sys.argv:
 	fsubs |= {i.lower() for i in ssubs} | {i.lower() for i in csubs}
 
+
+print "Requesting flair data on %d subreddits..." % len(fsubs)
+flairs = {}
 firstflair = True
 for i in fsubs:
 	flair = r.get_flair(i, sys.argv[1])
@@ -193,7 +204,17 @@ for i in fsubs:
 		if firstflair:
 			print "---- Known Flair ----"
 		firstflair = False
-		print "r/%s - %s" % (i, flairtext)
+		flairs.update({i: flair})
+		print "%sr/%s - %s" % ("*" if i.lower() not in uflairs else "", i, flairtext)
+
+if "EDC" in ssubs:
+	print "Found EDC post(s):"
+	for i in submissions:
+		if i.subreddit.display_name == "EDC":
+			print i
+
+# Guess external profiles
+
 
 class Profile(object):
 	"""

@@ -39,6 +39,7 @@ centralillinois
 centralvalley
 charlestonwv
 charlotte
+chch
 cherokeecountyga
 chicago
 christchurch
@@ -149,7 +150,6 @@ pennsylvania
 perth
 pueblo
 queens
-chch
 queensland
 realnyc
 regionalaustralia
