@@ -59,7 +59,7 @@ def is_gw_sub(subname):
 	sub = subname.lower()
 	if sub in gonewild:
 		return True
-	elif "gw" in sub or "gonewild" in sub:
+	elif sub.endswith("gw") or "gonewild" in sub:
 		print "Warning: heuristic detected subreddit not in list. Please report to the developer."
 		print "Click here: http://www.reddit.com/message/compose/?to=Lyucit&subject=Missing%20gw%20subreddit%20entry&message=" + sub + "%20is%20missing%20from%20your%20subreddit%20list."
 		return True
@@ -69,7 +69,7 @@ def is_gm_sub(subname):
 	sub = subname.lower()
 	if sub in gonemild:
 		return True
-	elif "gm" in sub or "gonemild" in sub:
+	elif sub.endswith("gm") or "gonemild" in sub:
 		print "Warning: heuristic detected subreddit not in list. Please report to the developer."
 		print "Click here: http://www.reddit.com/message/compose/?to=Lyucit&subject=Missing%20gm%20subreddit%20entry&message=" + sub + "%20is%20missing%20from%20your%20subreddit%20list."
 		return True
@@ -143,6 +143,7 @@ if narcissist:
 	print "---- About ----"
 	for i in narcissist:
 		print i
+
 
 gw = get_gonewild(submissions)
 if gw:

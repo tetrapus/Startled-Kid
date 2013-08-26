@@ -15,7 +15,6 @@ aspergers
 atheism
 australia
 battlefield3
-battlefield3
 bigdickproblems
 biology
 bisexual
@@ -24,6 +23,7 @@ books
 brisbane
 britishproblems
 cars
+childfree
 chronicpain
 codbo
 coffee
@@ -64,8 +64,6 @@ longdistance
 loseit
 luciddreaming
 masseffect
-masseffect
-minecraft
 minecraft
 mtb
 music
@@ -81,7 +79,6 @@ snowboarding
 steam
 summonerschool
 sysadmin
-sysadmin
 talesfromtechsupport
 tall
 teen4teen
@@ -90,6 +87,7 @@ teenmfa
 tf2
 tf2trade
 translator
+twitter
 typography
 unitedkingdom
 windowsphone

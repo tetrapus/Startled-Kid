@@ -52,11 +52,11 @@ class Subreddit(object):
     def addchild(self, child):
         self.children.append(child)
 
-    def echo(self):
+    def __str__(self):
         if args["--tree"]:
-            print ("   " * self.level) + self.full_name
+            return ("   " * self.level) + self.full_name
         else:
-            print self.full_name
+            return self.full_name
 
 
 
@@ -89,7 +89,7 @@ sub_queue = deque(sub_visited)
 try:
     while sub_queue:
         sub = popnext(sub_queue)
-        sub.echo()
+        print sub
 
         if checkskip(sub):
             continue
@@ -99,6 +99,7 @@ try:
                 next = Subreddit(i, sub)
                 sub_visited.append(next)
                 sub_queue.append(next)
+
 except KeyboardInterrupt:
     for i in sub_queue:
-        i.echo()
+        print i
