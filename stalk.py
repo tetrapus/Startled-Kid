@@ -5,6 +5,7 @@ import sys
 import re
 import time
 
+import requests
 import praw
 
 if len(sys.argv) < 2:
@@ -121,7 +122,8 @@ reduce_words = re.sub(r"&.{1,6};", " ", reduce_words)
 reduce_words = re.sub(r"([^-'\w]|_)", " ", reduce_words)
 reduce_words = re.sub(r"(([^\w])[-']|[-']([^\w])|^[-']|[-']$)", " ", reduce_words).lower().split()
 reduce_words = [i for i in reduce_words if not re.match(r"\d", i) and re.match("[a-zA-Z]", i)]
-unique = set(reduce_words) - dictionary
+uninteresting = set(open("data/uninterestingwords.txt").read().lower().split())
+unique = set(reduce_words) - dictionary - uninteresting
 
 if comments:
 	print "---- Word Data ----"
@@ -135,8 +137,8 @@ if comments:
 	print "Karma/Word: %s"% (float(user.comment_karma) / words)
 
 
-narcissist = [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use)\b[^.\n\[\]]+)", i.body, flags=re.IGNORECASE) for i in comments]
-narcissist += [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use)\b[^.\n\[\]]+)", i.selftext, flags=re.IGNORECASE) for i in submissions if i.is_self]
+narcissist = [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use| work at)\b[^.\n\[\]]+)", i.body, flags=re.IGNORECASE) for i in comments]
+narcissist += [re.findall(r"([^.\n[]]*\bi('m a| am a| live| have| used to| go to| love| use| work at)\b[^.\n\[\]]+)", i.selftext, flags=re.IGNORECASE) for i in submissions if i.is_self]
 narcissist = [i[0][0] for i in narcissist if i]
 narcissist = [i for i in narcissist if "than i " not in i.lower() and "i have no" not in i.lower() and "i have gotten" not in i.lower()] # be conservative
 if narcissist:
@@ -198,9 +200,9 @@ flairs = {}
 firstflair = True
 for i in fsubs:
 	flair = r.get_flair(i, sys.argv[1])
-	flairtext = flair["flair_text"]
+	flairtext = flair["flair_text"].encode('utf-8')
 	if flair["flair_css_class"]:
-		flairtext = "%s: %s" % (flair["flair_css_class"], flairtext)
+		flairtext = "%s: %s" % (flair["flair_css_class"].encode("utf-8"), flairtext)
 	if flairtext:
 		if firstflair:
 			print "---- Known Flair ----"
@@ -213,27 +215,93 @@ if "EDC" in ssubs:
 	for i in submissions:
 		if i.subreddit.display_name == "EDC":
 			print i
-
+name = []
+age = []
+gender = []
+country = []
 # Guess external profiles
+okcupid = requests.get("http://okcupid.com/profile/%s" % sys.argv[1]).text
+if "<title>OkCupid |  Account not found</title>" not in okcupid:
+	print "Possible OkCupid found: http://okcupid.com/profile/%s" % sys.argv[1]
+	okcdata = re.findall("<title>(.*?)</title>", okcupid)
+	if okcdata: print okcdata[0]
+github = requests.get("http://github.com/%s" % sys.argv[1]).text
+if "<title>Page not found &middot; GitHub</title>" not in github:
+	print "Possible github found: http://github.com/%s" % sys.argv[1]
+	ghdata = re.findall("<title>(.*?)</title>", github)[0]
+	print ghdata
+	ghndata = re.findall("\((.*)\)", ghdata)
+	if ghndata:
+		name.append(ghndata)
 
+twitter = requests.get("http://twitter.com/%s" % sys.argv[1]).text
+if "<title>Twitter / ?</title>" not in twitter:
+	print "Possible twitter found: http://twitter.com/%s" % sys.argv[1]
+	twtdata = re.findall("<title>(.*?)</title>", twitter)
+	if twtdata:
+		twtdata = twtdata[0]
+		twtname = re.findall("^(.+) \(", twtdata)
+		if twtname:
+			print twtname[0]
+			name.append(twtname[0])
+		else:
+			print twtdata
+
+imgur = requests.get("http://imgur.com/user/%s" % sys.argv[1]).text
+if "<title>	imgur: the simple 404 page</title>" not in imgur:
+	print "Possible imgur found: http://%s.imgur.com/" % sys.argv[1]
+	print "             Gallery: http://imgur.com/user/%s" % sys.argv[1]
+
+lastfm = requests.get("http://www.last.fm/user/%s" % sys.argv[1]).text
+if "<title>Last.fm - Listen to internet radio and the largest music catalogue online</title>" not in lastfm:
+	print "Possible last.fm found: http://www.last.fm/user/%s" % sys.argv[1]
+	lfmdata = re.findall('<p class="userInfo adr">.*?</p>', lastfm)
+	if lfmdata:
+		# print re.sub("<.*?>", "\n", lfmdata[0])
+		userdata = re.findall('<strong class="fn">(.*?)</strong>(?:, (\d+))?(?:, (Male|Female))?(?:, <span class="country-name">(.*?))?<', lfmdata[0])
+		if userdata:
+			userdata = userdata[0]
+			print userdata
+			name.append(userdata[0])
+			age.append(userdata[1])
+			gender.append(userdata[2])
+			country.append(userdata[3])
+		else:
+			print re.sub("<.*?>", "\n", lfmdata[0]).strip().replace("\n\n", "|").replace("\n", " ")
+
+facebook = requests.get("http://facebook.com/%s" % sys.argv[1]).text
+if '<title id="pageTitle">Page Not Found | Facebook</title>' not in facebook:
+	if '<title id="pageTitle">Content Not Found | Facebook</title>' not in facebook:
+
+		print "Possible public facebook profile found: http://facebook.com/%s" % sys.argv[1]
+		fbname = re.findall(r">(.*?) \| Facebook<", facebook)
+		if fbname:
+			print fbname
+			name.append(fbname)
+	else:
+		print "Probably has private facebook profile"
+
+tumblr = requests.get("http://%s.tumblr.com/" % sys.argv[1]).text
+if "<title>Not found.</title>" not in tumblr:
+	print "Possible tumblr profile: http://%s.tumblr.com/" % sys.argv[1]
 
 class Profile(object):
 	"""
 	Build a profile of known data for a user.
 	"""
-	age = None
-	sex = None
-	sexuality = None
-	phone = None
-	city = None
-	country = None
-	drugs = None
-	mbti = None
-	politics = None
-	religion = None
-	social = None
-	hipster = None # subreddits like mfa, coffee, etc
-	depression = None
+	age = []
+	sex = []
+	sexuality = []
+	phone = []
+	city = []
+	country = []
+	drugs = []
+	mbti = []
+	politics = []
+	religion = []
+	social = []
+	hipster = [] # subreddits like mfa, coffee, etc
+	depression = []
 
 class Metric(object):
 	pass

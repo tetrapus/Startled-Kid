@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Perform a bfs on a subreddit's sidebar.
 
@@ -89,7 +89,7 @@ sub_queue = deque(sub_visited)
 try:
     while sub_queue:
         sub = popnext(sub_queue)
-        print sub
+        print(sub)
 
         if checkskip(sub):
             continue
@@ -102,4 +102,4 @@ try:
 
 except KeyboardInterrupt:
     for i in sub_queue:
-        print i
+        print(i)
